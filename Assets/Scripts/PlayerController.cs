@@ -55,6 +55,35 @@ public class PlayerController : MonoBehaviour
         }
     }
 }
+
+// Spawn the obstacle again and again.empty gameobject "GameManager" will take care of it.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // when mouse is clicked once jump is fine but when mouse is clicked again (when player is still in the air) it again starts jumping from air to more height.
 //  we want that it's next jump should be when it comes down on the ground.For this 
 // execution sequence | Awake - Start - (*Physics* FixedUpdate - OnTrigger-OnCollision) - (*Input events* OnMouseDown) - Update - LateUpdate -(*The last* OnDestroy)
