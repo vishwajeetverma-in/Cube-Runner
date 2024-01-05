@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -42,6 +43,15 @@ public class PlayerController : MonoBehaviour
         if (collision.collider.gameObject.tag == "Ground")
         {
             canJump = false;
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+       
+        if(other.gameObject.tag== "Obstacle")
+        {
+            SceneManager.LoadScene("Level1");
         }
     }
 }
