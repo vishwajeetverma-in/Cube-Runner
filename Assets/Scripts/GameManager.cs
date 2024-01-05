@@ -1,12 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
     public GameObject obstacle;
     public Transform spawnPoint;
-    //int score = 0;
+    int score = 0;
+    public TextMeshProUGUI scoreText;
+    public GameObject playButton;
     // Start is called before the first frame update
     void Start()
     {

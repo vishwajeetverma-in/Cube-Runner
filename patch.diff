@@ -1,0 +1,218 @@
+From bcf442495358cd0ce920305c8af8b91343a0ffd8 Mon Sep 17 00:00:00 2001
+From: vishwajeetverma-in <vishwa11126@gmail.com>
+Date: Fri, 5 Jan 2024 14:41:15 +0530
+Subject: [PATCH] Spawning logic using CoRoutines
+
+3 variables for spawn handling one for holding the gamobject which will spawn , one for location where it will spawn , because game will restart ata this point so score =0.
+//make a coroutine method of IEnumerator type for time gap with random.range for random time interval. and put it in infinite loop using while loop.
+// then instatiate gameobject with spawnposition.
+// then use StartCoroutine("name of IEnumerator method") method  in update().
+//  Awake - Start - (*Physics* FixedUpdate - OnTrigger-OnCollision) - (*Input events* OnMouseDown) - Update - coroutines-  LateUpdate - (*scene rendering*
+
+//                                                                                                                                  Onbecamevisible/invisible)-(*The last* OnDestroy)
+
+// give refrence from prefab rather than from gameobject because gameobject can be deleted during run time and also dont forget to disable the gameobject.
+---
+ Assets/Scenes/Level1.unity         | 55 ++++++++++++++++++++++++++++++
+ Assets/Scripts/GameManager.cs      | 45 ++++++++++++++++++++++++
+ Assets/Scripts/GameManager.cs.meta | 11 ++++++
+ Assets/Scripts/PlayerController.cs | 29 ++++++++++++++++
+ 4 files changed, 140 insertions(+)
+ create mode 100644 Assets/Scripts/GameManager.cs
+ create mode 100644 Assets/Scripts/GameManager.cs.meta
+
+diff --git a/Assets/Scenes/Level1.unity b/Assets/Scenes/Level1.unity
+index 1413d39..8143452 100644
+--- a/Assets/Scenes/Level1.unity
++++ b/Assets/Scenes/Level1.unity
+@@ -322,6 +322,52 @@ Transform:
+   m_Children: []
+   m_Father: {fileID: 0}
+   m_LocalEulerAnglesHint: {x: 0, y: -6, z: 0}
++--- !u!1 &861929550
++GameObject:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  serializedVersion: 6
++  m_Component:
++  - component: {fileID: 861929551}
++  - component: {fileID: 861929552}
++  m_Layer: 0
++  m_Name: GameManager
++  m_TagString: Untagged
++  m_Icon: {fileID: 0}
++  m_NavMeshLayer: 0
++  m_StaticEditorFlags: 0
++  m_IsActive: 1
++--- !u!4 &861929551
++Transform:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 861929550}
++  serializedVersion: 2
++  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
++  m_LocalPosition: {x: 0, y: 0, z: 0}
++  m_LocalScale: {x: 1, y: 1, z: 1}
++  m_ConstrainProportionsScale: 0
++  m_Children: []
++  m_Father: {fileID: 0}
++  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
++--- !u!114 &861929552
++MonoBehaviour:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 861929550}
++  m_Enabled: 1
++  m_EditorHideFlags: 0
++  m_Script: {fileID: 11500000, guid: 425a4ed43714195438dd9e44eae56700, type: 3}
++  m_Name: 
++  m_EditorClassIdentifier: 
++  obstacle: {fileID: 3099898527940030293, guid: fffbd9b9c180f6c458dfb505729f2d65, type: 3}
++  spawnPoint: {fileID: 0}
+ --- !u!1 &892876192
+ GameObject:
+   m_ObjectHideFlags: 0
+@@ -573,6 +619,10 @@ PrefabInstance:
+       propertyPath: m_Name
+       value: Obstacles
+       objectReference: {fileID: 0}
++    - target: {fileID: 3099898527940030293, guid: fffbd9b9c180f6c458dfb505729f2d65, type: 3}
++      propertyPath: m_IsActive
++      value: 0
++      objectReference: {fileID: 0}
+     - target: {fileID: 6595062967245462542, guid: fffbd9b9c180f6c458dfb505729f2d65, type: 3}
+       propertyPath: m_LocalPosition.x
+       value: -3.47
+@@ -613,6 +663,10 @@ PrefabInstance:
+       propertyPath: m_LocalEulerAnglesHint.z
+       value: 0
+       objectReference: {fileID: 0}
++    - target: {fileID: 7877981111451248767, guid: fffbd9b9c180f6c458dfb505729f2d65, type: 3}
++      propertyPath: m_IsTrigger
++      value: 1
++      objectReference: {fileID: 0}
+     m_RemovedComponents: []
+     m_RemovedGameObjects: []
+     m_AddedGameObjects: []
+@@ -627,3 +681,4 @@ SceneRoots:
+   - {fileID: 848951351}
+   - {fileID: 892876196}
+   - {fileID: 7185420719791790607}
++  - {fileID: 861929551}
+diff --git a/Assets/Scripts/GameManager.cs b/Assets/Scripts/GameManager.cs
+new file mode 100644
+index 0000000..f82ec60
+--- /dev/null
++++ b/Assets/Scripts/GameManager.cs
+@@ -0,0 +1,45 @@
++using System.Collections;
++using System.Collections.Generic;
++using UnityEngine;
++
++public class GameManager : MonoBehaviour
++{
++    public GameObject obstacle;
++    public Transform spawnPoint;
++    //int score = 0;
++    // Start is called before the first frame update
++    void Start()
++    {
++        GameStart();
++    }
++
++    // Update is called once per frame
++    void Update()
++    {
++        
++    }
++
++    IEnumerator SpawnObstacles()
++    {
++        while (true)
++        {
++            float waitTime = Random.Range(0.2f, 2f);
++            yield return new WaitForSeconds(waitTime);  
++            Instantiate(obstacle, spawnPoint.position, Quaternion.identity);  
++        }
++    }
++    public void GameStart()
++    {
++        StartCoroutine("SpawnObstacles");   
++    }
++}
++// 3 variables for spawn handling one for holding the gamobject which will spawn , one for location where it will spawn , because game will restart ata this point so score =0.
++//make a coroutine method of IEnumerator type for time gap with random.range for random time interval. and put it in infinite loop using while loop.
++// then instatiate gameobject with spawnposition.
++// then use StartCoroutine("name of IEnumerator method") method  in update().
++//  Awake - Start - (*Physics* FixedUpdate - OnTrigger-OnCollision) - (*Input events* OnMouseDown) - Update - coroutines-  LateUpdate - (*scene rendering*
++
++//                                                                                                                                  Onbecamevisible/invisible)-(*The last* OnDestroy)
++
++// give refrence from prefab rather than from gameobject because gameobject can be deleted during run time and also dont forget to disable the gameobject.
++
+diff --git a/Assets/Scripts/GameManager.cs.meta b/Assets/Scripts/GameManager.cs.meta
+new file mode 100644
+index 0000000..0df9982
+--- /dev/null
++++ b/Assets/Scripts/GameManager.cs.meta
+@@ -0,0 +1,11 @@
++fileFormatVersion: 2
++guid: 425a4ed43714195438dd9e44eae56700
++MonoImporter:
++  externalObjects: {}
++  serializedVersion: 2
++  defaultReferences: []
++  executionOrder: 0
++  icon: {instanceID: 0}
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
+diff --git a/Assets/Scripts/PlayerController.cs b/Assets/Scripts/PlayerController.cs
+index ef74418..c8c5e87 100644
+--- a/Assets/Scripts/PlayerController.cs
++++ b/Assets/Scripts/PlayerController.cs
+@@ -55,6 +55,35 @@ public class PlayerController : MonoBehaviour
+         }
+     }
+ }
++
++// Spawn the obstacle again and again.empty gameobject "GameManager" will take care of it.
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
++
+ // when mouse is clicked once jump is fine but when mouse is clicked again (when player is still in the air) it again starts jumping from air to more height.
+ //  we want that it's next jump should be when it comes down on the ground.For this 
+ // execution sequence | Awake - Start - (*Physics* FixedUpdate - OnTrigger-OnCollision) - (*Input events* OnMouseDown) - Update - LateUpdate -(*The last* OnDestroy)
+-- 
+2.39.1.windows.1
+
