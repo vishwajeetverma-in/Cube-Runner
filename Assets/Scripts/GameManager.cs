@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     int score = 0;
     public TextMeshProUGUI scoreText;
     public GameObject playButton;
+    public GameObject player;
     // Start is called before the first frame update
     void Start()
     {
@@ -33,6 +34,8 @@ public class GameManager : MonoBehaviour
     }
     public void GameStart()
     {
+        player.SetActive(true);
+        playButton.SetActive(false);
         StartCoroutine("SpawnObstacles");   
     }
 }
