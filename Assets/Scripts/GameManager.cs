@@ -32,6 +32,11 @@ public class GameManager : MonoBehaviour
             Instantiate(obstacle, spawnPoint.position, Quaternion.identity);  
         }
     }
+    void ScoreUp()
+    {
+        score++;
+        scoreText.text = score.ToString();
+    }
     public void GameStart()
     {
         player.SetActive(true);
