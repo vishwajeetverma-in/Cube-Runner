@@ -41,7 +41,8 @@ public class GameManager : MonoBehaviour
     {
         player.SetActive(true);
         playButton.SetActive(false);
-        StartCoroutine("SpawnObstacles");   
+        StartCoroutine("SpawnObstacles");
+        InvokeRepeating("ScoreUp", 2f, 1f);
     }
 }
 // 3 variables for spawn handling one for holding the gamobject which will spawn , one for location where it will spawn , because game will restart ata this point so score =0.
