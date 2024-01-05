@@ -18,4 +18,9 @@ public class Obstacles : MonoBehaviour
         
     }
 
+    private void OnBecameInvisible()
+    {
+        Destroy(gameObject);
+    }
+
 }
